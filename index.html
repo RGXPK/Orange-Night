@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Orange Night </title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #000;
+    color: #ffeb3b;
+    transition: background 0.3s, color 0.3s;
+  }
+  header {
+    background: #FF9D00;
+    padding: 10px;
+    text-align: center;
+    color: #000;
+    position: relative;
+  }
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  select, input {
+    padding: 8px;
+    font-size: 14px;
+    border: 2px solid #ffeb3b;
+    border-radius: 5px;
+    background: #000;
+    color: #ffeb3b;
+  }
+  select option {
+    background: #000;
+    color: #ffeb3b;
+  }
+  select option:hover {
+    background: #333;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 20px;
+  }
+  .card {
+    background: #222;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(255, 235, 59, 0.5);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: #ffeb3b;
+    position: relative;
+  }
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255, 235, 59, 0.9);
+  }
+  .card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-bottom: 2px solid #ffeb3b;
+  }
+  .card-buttons {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    display: flex;
+    gap: 5px;
+  }
+  .card-buttons button {
+    background: #FF8301;
+    border: none;
+    color: #000;
+    padding: 5px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    transition: background 0.3s;
+  }
+  .card-buttons button:hover {
+    background: #FF5F00;
+  }
+  #detailPage {
+    display: none;
+    max-width: 700px;
+    margin: 20px auto;
+    background: #222;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(255, 235, 59, 0.6);
+    color: #ffeb3b;
+  }
+  #detailPage img {
+    width: 100%;
+    border-radius: 10px;
+    max-height: 400px;
+    object-fit: cover;
+    border-bottom: 2px solid #FF9100;
+  }
+  #detailPage h2 {
+    margin-top: 10px;
+  }
+  #detailPage p {
+    margin: 10px 0;
+  }
+  #backBtn {
+    background: #FF8301;
+    border: none;
+    color: #000;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    transition: background 0.3s;
+  }
+  #backBtn:hover {
+    background: #FF7900;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    color: #ffeb3b;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-content h3 {
+    margin-top: 0;
+    text-align: center;
+  }
+  .modal-content label {
+    display: block;
+    margin: 10px 0 5px;
+  }
+  .modal-content input[type="text"],
+  .modal-content select,
+  .modal-content textarea {
+    width: 100%;
+    padding: 7px;
+    border-radius: 5px;
+    border: 2px solid #ffeb3b;
+    background: #000;
+    color: #ffeb3b;
+    resize: vertical;
+  }
+  .modal-content textarea {
+    height: 60px;
+  }
+  .modal-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .modal-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .modal-buttons {
+    margin-top: 15px;
+    text-align: center;
+  }
+  .modal-buttons button {
+    background: #FF8301;
+    border: none;
+    color: #000;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  .modal-buttons button:hover {
+    background: #FF5F00;
+  }
+  #addNewBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #FF8301;
+    border: none;
+    color: #000;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  #addNewBtn:hover {
+    background: #FF5F00;
+  }
+  .country-search-container {
+    position: relative;
+  }
+  .country-search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 2px solid #ffeb3b;
+    border-radius: 5px;
+    background: #000;
+    color: #ffeb3b;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>أOrange Night</h1>
+  <button id="addNewBtn"><img src="[url=https://top4top.io/][img]https://i.top4top.io/s_350867k5j2.png[/img][/url]"></button>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="ابحث عن ممثلة..." />
+  <select id="filterType">
+    <option value="all">كل الأنواع</option>
+    <option value="Rectangle">Rectangle</option>
+    <option value="Hourglass Figure">Hourglass Figure</option>
+    <option value="Pear Shape">Pear Shape</option>
+    <option value="MILF">MILF</option>
+  </select>
+  <div class="country-search-container">
+    <input type="text" id="countrySearch" class="country-search-input" placeholder="ابحث عن بلد..." />
+    <select id="filterCountry" size="1">
+      <option value="all">كل البلدان</option>
+      <!-- سيتم إضافة البلدان عبر الجافاسكريبت -->
+    </select>
+  </div>
+</div>
+
+<div class="grid" id="actressGrid"></div>
+
+<!-- صفحة التفاصيل -->
+<div id="detailPage">
+  <button id="backBtn">رجوع</button>
+  <h2 id="detailName"></h2>
+  <img id="detailImage" src="" alt="" />
+  <p><strong>الفئات:</strong> <span id="detailTypes"></span></p>
+  <p><strong>البلد:</strong> <span id="detailCountry"></span></p>
+  <p id="detailBio"></p>
+  <p>
+    <strong>وسائل التواصل الاجتماعي:</strong><br />
+    <a id="detailFacebook" href="#" target="_blank" style="color:#ffeb3b;">
+</a> |
+    <a id="detailInstagram" href="#" target="_blank" style="color:#ffeb3b;">إنستغرام</a> |
+    <a id="detailTwitter" href="#" target="_blank" style="color:#ffeb3b;">تويتر</a>
+  </p>
+</div>
+
+<!-- مودال إضافة / تعديل -->
+<div id="addModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">إضافة ممثلة جديدة</h3>
+    <label for="newName">الاسم:</label>
+    <input type="text" id="newName" placeholder="أدخل اسم الممثلة" />
+
+    <label>الأنواع:</label>
+    <div class="modal-checkboxes">
+      <label><input type="checkbox" value="Rectangle" class="newType"> Rectangle</label>
+      <label><input type="checkbox" value="Hourglass Figure" class="newType"> Hourglass Figure</label>
+      <label><input type="checkbox" value="Pear Shape" class="newType"> Pear Shape</label>
+      <label><input type="checkbox" value="MILF" class="newType"> MILF</label>
+    </div>
+
+    <label for="newCountry">البلد:</label>
+    <div class="country-search-container">
+      <input type="text" id="modalCountrySearch" class="country-search-input" placeholder="ابحث عن بلد..." />
+      <select id="newCountry" size="1">
+        <!-- سيتم إضافة البلدان عبر الجافاسكريبت -->
+      </select>
+    </div>
+
+    <label for="newImage">رابط الصورة:</label>
+    <input type="text" id="newImage" placeholder="أدخل رابط الصورة" />
+
+    <label for="newBio">نبذة تعريفية:</label>
+    <textarea id="newBio" placeholder="أدخل نبذة قصيرة"></textarea>
+
+    <label for="newFacebook">رابط  porn hub :</label>
+    <input type="text" id="newFacebook" placeholder="https://facebook.com/username" />
+
+    <label for="newInstagram">رابط إنستغرام:</label>
+    <input type="text" id="newInstagram" placeholder="https://instagram.com/username" />
+
+    <label for="newTwitter">رابط تويتر:</label>
+    <input type="text" id="newTwitter" placeholder="https://twitter.com/username" />
+
+    <div class="modal-buttons">
+      <button id="saveBtn">حفظ</button>
+      <button id="cancelBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// قائمة جميع البلدان
+const countries = [
+  "أفغانستان", "ألبانيا", "الجزائر", "أندورا", "أنغولا", "أنتيغوا وباربودا", 
+  "الأرجنتين", "أرمينيا", "أستراليا", "النمسا", "أذربيجان", "البهاما", 
+  "البحرين", "بنغلاديش", "باربادوس", "بيلاروسيا", "بلجيكا", "بليز", 
+  "بنين", "بوتان", "بوليفيا", "البوسنة والهرسك", "بوتسوانا", "البرازيل", 
+  "بروناي", "بلغاريا", "بوركينا فاسو", "بوروندي", "كمبوديا", "الكاميرون", 
+  "كندا", "الرأس الأخضر", "جمهورية أفريقيا الوسطى", "تشاد", "تشيلي", 
+  "الصين", "كولومبيا", "جزر القمر", "جمهورية الكونغو", "كوستاريكا", 
+  "كرواتيا", "كوبا", "قبرص", "جمهورية التشيك", "الدنمارك", "جيبوتي", 
+  "دومينيكا", "جمهورية الدومينيكان", "تيمور الشرقية", "الإكوادور", 
+  "مصر", "السلفادور", "غينيا الاستوائية", "إريتريا", "إستونيا", 
+  "إسواتيني", "إثيوبيا", "فيجي", "فنلندا", "فرنسا", "الغابون", 
+  "غامبيا", "جورجيا", "ألمانيا", "غانا", "اليونان", "غرينادا", 
+  "غواتيمالا", "غينيا", "غينيا بيساو", "غيانا", "هايتي", "هندوراس", 
+  "المجر", "آيسلندا", "الهند", "إندونيسيا", "إيران", "العراق", 
+  "أيرلندا", "إسرائيل", "إيطاليا", "ساحل العاج", "جامايكا", "اليابان", 
+  "الأردن", "كازاخستان", "كينيا", "كيريباتي", "كوريا الشمالية", 
+  "كوريا الجنوبية", "الكويت", "قيرغيزستان", "لاوس", "لاتفيا", 
+  "لبنان", "ليسوتو", "ليبيريا", "ليبيا", "ليختنشتاين", "ليتوانيا", 
+  "لوكسمبورغ", "مدغشقر", "مالاوي", "ماليزيا", "جزر المالديف", "مالي", 
+  "مالطا", "جزر مارشال", "موريتانيا", "موريشيوس", "المكسيك", 
+  "ولايات ميكرونيسيا المتحدة", "مولدوفا", "موناكو", "منغوليا", 
+  "الجبل الأسود", "المغرب", "موزمبيق", "ميانمار", "ناميبيا", "ناورو", 
+  "نيبال", "هولندا", "نيوزيلندا", "نيكاراغوا", "النيجر", "نيجيريا", 
+  "مقدونيا الشمالية", "النرويج", "عمان", "باكستان", "بالاو", "بنما", 
+  "بابوا غينيا الجديدة", "باراغواي", "بيرو", "الفلبين", "بولندا", 
+  "البرتغال", "قطر", "رومانيا", "روسيا", "رواندا", "سانت كيتس ونيفيس", 
+  "سانت لوسيا", "سانت فينسنت والغرينادين", "ساموا", "سان مارينو", 
+  "ساو تومي وبرينسيب", "السعودية", "السنغال", "صربيا", "سيشل", 
+  "سيراليون", "سنغافورة", "سلوفاكيا", "سلوفينيا", "جزر سليمان", 
+  "الصومال", "جنوب أفريقيا", "جنوب السودان", "إسبانيا", "سريلانكا", 
+  "السودان", "سورينام", "السويد", "سويسرا", "سوريا", "تايوان", 
+  "طاجيكستان", "تنزانيا", "تايلاند", "توغو", "تونغا", "ترينيداد وتوباغو", 
+  "تونس", "تركيا", "تركمانستان", "توفالو", "أوغندا", "أوكرانيا", 
+  "الإمارات العربية المتحدة", "المملكة المتحدة", "الولايات المتحدة", 
+  "أوروغواي", "أوزبكستان", "فانواتو", "الفاتيكان", "فنزويلا", 
+  "فيتنام", "اليمن", "زامبيا", "زيمبابوي"
+];
+
+// بيانات مبدئية
+let actresses = [
+{
+  id: 1,
+  name: "ساشا غوربان",
+  types: ["Rectangle"],
+  country: "روسيا",
+  image: "https://i.postimg.cc/W43r6dTq/Sasha-Gurban.png",
+  bio: "ممثلة روسية شهيرة بجمالها الفريد وشكل جسمها المستقيم.",
+  facebook: "https://www.facebook.com/sasha.gurban",
+  instagram: "https://www.instagram.com/sasha.gurban",
+  twitter: "https://twitter.com/sashagurban"
+},
+{
+  id: 2,
+  name: "كريستينا كيرتس",
+  types: ["Hourglass Figure"],
+  country: "روسيا",
+  image: "https://i.postimg.cc/g0b02vPt/Kristina-Kirts.png",
+  bio: "ممثلة ذات قوام الساعة الرملية من روسيا.",
+  facebook: "#",
+  instagram: "#",
+  twitter: "#"
+},
+{
+  id: 3,
+  name: "سارة ميشيل",
+  types: ["Pear Shape"],
+  country: "لبنان",
+  image: "https://i.postimg.cc/RZMhz6hf/Sarah-Michell.png",
+  bio: "ممثلة لبنانية معروفة بشكل جسم الكمثرى.",
+  facebook: "#",
+  instagram: "#",
+  twitter: "#"
+}];
+
+// المتغيرات العامة
+const grid = document.getElementById("actressGrid");
+const searchInput = document.getElementById("search");
+const filterType = document.getElementById("filterType");
+const filterCountry = document.getElementById("filterCountry");
+const countrySearchInput = document.getElementById("countrySearch");
+const modalCountrySearchInput = document.getElementById("modalCountrySearch");
+
+const detailPage = document.getElementById("detailPage");
+const backBtn = document.getElementById("backBtn");
+const detailName = document.getElementById("detailName");
+const detailImage = document.getElementById("detailImage");
+const detailTypes = document.getElementById("detailTypes");
+const detailCountry = document.getElementById("detailCountry");
+const detailBio = document.getElementById("detailBio");
+const detailFacebook = document.getElementById("detailFacebook");
+const detailInstagram = document.getElementById("detailInstagram");
+const detailTwitter = document.getElementById("detailTwitter");
+
+const addModal = document.getElementById("addModal");
+const modalTitle = document.getElementById("modalTitle");
+const newName = document.getElementById("newName");
+const newTypes = document.querySelectorAll(".newType");
+const newCountry = document.getElementById("newCountry");
+const newImage = document.getElementById("newImage");
+const newBio = document.getElementById("newBio");
+const newFacebook = document.getElementById("newFacebook");
+const newInstagram = document.getElementById("newInstagram");
+const newTwitter = document.getElementById("newTwitter");
+const saveBtn = document.getElementById("saveBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const addNewBtn = document.getElementById("addNewBtn");
+
+let editingId = null;
+
+// دالة لملء قائمة البلدان
+function populateCountries(selectElement) {
+  // إضافة الخيار الافتراضي
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "all";
+  defaultOption.textContent = "كل البلدان";
+  selectElement.appendChild(defaultOption);
+  
+  // إضافة جميع البلدان
+  countries.forEach(country => {
+    const option = document.createElement("option");
+    option.value = country;
+    option.textContent = country;
+    selectElement.appendChild(option);
+  });
+}
+
+// دالة للبحث في قائمة البلدان
+function setupCountrySearch(searchInput, countrySelect) {
+  searchInput.addEventListener("input", function() {
+    const searchTerm = this.value.trim().toLowerCase();
+    const options = countrySelect.options;
+    
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+      if (option.value === "all") {
+        option.style.display = searchTerm ? "none" : "";
+        continue;
+      }
+      
+      if (option.text.toLowerCase().includes(searchTerm)) {
+        option.style.display = "";
+      } else {
+        option.style.display = "none";
+      }
+    }
+  });
+}
+
+// دالة عرض القائمة مع الفلاتر والبحث
+function renderList() {
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  const selectedType = filterType.value;
+  const selectedCountry = filterCountry.value;
+  
+  grid.innerHTML = "";
+  
+  let filtered = actresses.filter(a => {
+    const matchesSearch = a.name.toLowerCase().includes(searchTerm);
+    const matchesType = selectedType === "all" || a.types.includes(selectedType);
+    const matchesCountry = selectedCountry === "all" || a.country === selectedCountry;
+    return matchesSearch && matchesType && matchesCountry;
+  });
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>لا توجد ممثلات مطابقة.</p>";
+    return;
+  }
+  
+  filtered.forEach(actress => {
+    const card = document.createElement("div");
+    card.className = "card";
+    
+    card.innerHTML = `
+      <div class="card-buttons">
+        <button class="editBtn">تعديل</button>
+        <button class="deleteBtn">حذف</button>
+      </div>
+      <img src="${actress.image}" alt="${actress.name}" />
+      <h3>${actress.name}</h3>
+      <p>${actress.types.join(", ")}</p>
+    `;
+    
+    // عرض التفاصيل عند النقر على البطاقة (باستثناء الأزرار)
+    card.addEventListener("click", e => {
+      if (e.target.classList.contains("editBtn") || e.target.classList.contains("deleteBtn")) return;
+      showDetails(actress.id);
+    });
+    
+    // تعديل
+    card.querySelector(".editBtn").addEventListener("click", e => {
+      e.stopPropagation();
+      openEditModal(actress.id);
+    });
+    
+    // حذف مع تأكيد
+    card.querySelector(".deleteBtn").addEventListener("click", e => {
+      e.stopPropagation();
+      if (confirm(`هل أنت متأكد من حذف ${actress.name}؟`)) {
+        actresses = actresses.filter(a => a.id !== actress.id);
+        renderList();
+      }
+    });
+    
+    grid.appendChild(card);
+  });
+}
+
+// عرض تفاصيل ممثلة
+function showDetails(id) {
+  const actress = actresses.find(a => a.id === id);
+  if (!actress) return;
+  
+  detailName.textContent = actress.name;
+  detailImage.src = actress.image;
+  detailTypes.textContent = actress.types.join(", ");
+  detailCountry.textContent = actress.country;
+  detailBio.textContent = actress.bio;
+  detailFacebook.href = actress.facebook || "#";
+  detailInstagram.href = actress.instagram || "#";
+  detailTwitter.href = actress.twitter || "#";
+  
+  detailPage.style.display = "block";
+  grid.style.display = "none";
+  document.querySelector(".controls").style.display = "none";
+  addNewBtn.style.display = "none";
+}
+
+// إخفاء صفحة التفاصيل والعودة للقائمة
+backBtn.addEventListener("click", () => {
+  detailPage.style.display = "none";
+  grid.style.display = "grid";
+  document.querySelector(".controls").style.display = "flex";
+  addNewBtn.style.display = "inline-block";
+});
+
+// فتح مودال الإضافة
+addNewBtn.addEventListener("click", () => {
+  editingId = null;
+  modalTitle.textContent = "إضافة ممثلة جديدة";
+  clearModal();
+  openModal();
+});
+
+// فتح المودال للتعديل
+function openEditModal(id) {
+  const actress = actresses.find(a => a.id === id);
+  if (!actress) return;
+  editingId = id;
+  modalTitle.textContent = "تعديل بيانات الممثلة";
+  newName.value = actress.name;
+  newCountry.value = actress.country;
+  newImage.value = actress.image;
+  newBio.value = actress.bio;
+  newFacebook.value = actress.facebook || "";
+  newInstagram.value = actress.instagram || "";
+  newTwitter.value = actress.twitter || "";
+  
+  // ضبط checkboxes
+  newTypes.forEach(chk => {
+    chk.checked = actress.types.includes(chk.value);
+  });
+  
+  openModal();
+}
+
+// فتح وإغلاق المودال
+function openModal() {
+  addModal.style.display = "flex";
+}
+
+function closeModal() {
+  addModal.style.display = "none";
+}
+
+cancelBtn.addEventListener("click", () => {
+  closeModal();
+});
+
+// مسح محتويات المودال
+function clearModal() {
+  newName.value = "";
+  newCountry.value = "روسيا";
+  newImage.value = "";
+  newBio.value = "";
+  newFacebook.value = "";
+  newInstagram.value = "";
+  newTwitter.value = "";
+  newTypes.forEach(chk => chk.checked = false);
+}
+
+// حفظ بيانات الإضافة أو التعديل
+saveBtn.addEventListener("click", () => {
+  const name = newName.value.trim();
+  const types = [...newTypes].filter(chk => chk.checked).map(chk => chk.value);
+  const country = newCountry.value;
+  const image = newImage.value.trim();
+  const bio = newBio.value.trim();
+  const facebook = newFacebook.value.trim();
+  const instagram = newInstagram.value.trim();
+  const twitter = newTwitter.value.trim();
+  
+  if (!name || types.length === 0 || !image) {
+    alert("يرجى تعبئة الاسم، اختيار نوع واحد على الأقل، وإدخال رابط صورة.");
+    return;
+  }
+  
+  if (editingId) {
+    // تعديل
+    const actress = actresses.find(a => a.id === editingId);
+    if (actress) {
+      actress.name = name;
+      actress.types = types;
+      actress.country = country;
+      actress.image = image;
+      actress.bio = bio;
+      actress.facebook = facebook;
+      actress.instagram = instagram;
+      actress.twitter = twitter;
+    }
+  } else {
+    // إضافة جديدة
+    const newId = actresses.length ? Math.max(...actresses.map(a => a.id)) + 1 : 1;
+    actresses.push({
+      id: newId,
+      name,
+      types,
+      country,
+      image,
+      bio,
+      facebook,
+      instagram,
+      twitter
+    });
+  }
+  
+  closeModal();
+  renderList();
+});
+
+// تحديث العرض عند البحث أو الفلاتر
+searchInput.addEventListener("input", renderList);
+filterType.addEventListener("change", renderList);
+filterCountry.addEventListener("change", renderList);
+
+// تهيئة قوائم البلدان
+document.addEventListener("DOMContentLoaded", function() {
+  populateCountries(filterCountry);
+  populateCountries(newCountry);
+  
+  // إعداد خاصية البحث للبلد في الواجهة الرئيسية
+  setupCountrySearch(countrySearchInput, filterCountry);
+  
+  // إعداد خاصية البحث للبلد في المودال
+  setupCountrySearch(modalCountrySearchInput, newCountry);
+  
+  // بدءاً بعرض القائمة
+  renderList();
+});
+</script>
+
+</body>
+</html>

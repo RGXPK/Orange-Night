@@ -294,31 +294,8 @@ function baseRows(){
   });
   return Object.values(m).map(r=>({...r,gd:r.gf-r.ga,pts:r.w*3+r.d-(r.t.ded||0)}));
 }
-function h2hSort(group){
-  const ids=new Set(group.map(r=>r.t.id));
-  const h={};group.forEach(r=>h[r.t.id]={pts:0,gf:0,ga:0});
-  S.matches.forEach(m=>{
-    if(!ids.has(m.h)||!ids.has(m.a))return;
-    h[m.h].gf+=m.hs;h[m.h].ga+=m.as;h[m.a].gf+=m.as;h[m.a].ga+=m.hs;
-    if(m.hs>m.as)h[m.h].pts+=3;else if(m.hs<m.as)h[m.a].pts+=3;else{h[m.h].pts+=1;h[m.a].pts+=1}
-  });
-  return group.slice().sort((a,b)=>{
-    const A=h[a.t.id],B=h[b.t.id],agd=A.gf-A.ga,bgd=B.gf-B.ga;
-    return B.pts-A.pts||bgd-agd||B.gf-A.gf||b.gd-a.gd||b.gf-a.gf||a.t.name.localeCompare(b.t.name,'ar');
-  });
-}
 function stats(){
-  const rows=baseRows().sort((a,b)=>b.pts-a.pts);
-  const out=[];
-  let i=0;
-  while(i<rows.length){
-    let j=i+1;
-    while(j<rows.length&&rows[j].pts===rows[i].pts)j++;
-    const group=rows.slice(i,j);
-    out.push(...(group.length>1?h2hSort(group):group));
-    i=j;
-  }
-  return out;
+  return baseRows().sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.t.name.localeCompare(b.t.name,'ar'));
 }
 function roundsMap(){
   const rounds=new Map();
